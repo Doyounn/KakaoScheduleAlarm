@@ -60,7 +60,7 @@ while True:
     term_hour = 1
     end_hour = 15 if day == "Wed" else 16 # 수요일은 15시까지, 다른 날은 16시까지
     ok_hour = [i for i in range(start_hour, end_hour+1, term_hour)] # 1시간마다 전송
-    send_min = 1 if hour < 13 else 45 # 점심 전까지는 55분에, 이후에는 45분에 안내
+    send_min = 55 if hour < 13 else 45 # 점심 전까지는 55분에, 이후에는 45분에 안내
     numday = {
         "Mon": 0,
         "Tue": 1,
