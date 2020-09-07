@@ -58,7 +58,7 @@ while True:
     ok_day = ["Mon", "Tue", "Wed", "Thu", "Fri"]
     start_hour = 9
     term_hour = 1
-    end_hour = 15 if day == "Wed" else 16 # 수요일은 15시까지, 다른 날은 16시까지
+    end_hour = 14 if day == "Wed" else 15 # 수요일은 6교시까지, 다른 날은 7교시까지
     ok_hour = [i for i in range(start_hour, end_hour+1, term_hour)] # 1시간마다 전송
     send_min = 55 if hour < 13 else 45 # 점심 전까지는 55분에, 이후에는 45분에 안내
     numday = {
@@ -70,9 +70,15 @@ while True:
     }.get(day, "DEFAULT")
     now_schedule = schedule[numday][col-1]
     now_schedule_link = schedule_link.get(now_schedule)
-    message = "📢 [Bot] 현재 시간 {0}시 {1}분을 지나가고 있습니다.\n" \
-              "{2}교시는 {3}시간입니다. 아래의 링크를 통해 들어오세요.\n" \
-              "{4}".format(hour, minute, col, now_schedule, now_schedule_link)
+
+    if(now_schedule == schedule_link.get(schedule[numday][col-2])):
+        message = "📢 [Bot] 이번교시는 연강입니다.\n" \
+                  "혹시 튕기거나 나갔다면 아래의 링크를 통해 다시 접속해주세요.\n" \
+                  "{0}".format(now_schedule_link)
+    else:
+        messge = "📢 [Bot] 현재 시간 {0}시 {1}분을 지나가고 있습니다.\n" \
+                 "{2}교시는 {3}시간입니다. 아래의 링크를 통해 들어오세요.\n" \
+                 "{4}".format(hour, minute, col, now_schedule, now_schedule_link)
 
     for room in kakaoRoomName:
         if (day in ok_day):
