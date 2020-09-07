@@ -79,7 +79,7 @@ while True:
     now_schedule = getTodaySchedule(day, col-1)
     now_schedule_link = getTodayScheduleLink(now_schedule)
 
-    if now_schedule == getTodayScheduleLink(getTodaySchedule(col-2)):
+    if now_schedule == getTodayScheduleLink(getTodaySchedule(day, col-2)):
         message = "📢 [Bot] 이번교시는 연강입니다.\n" \
                   "혹시 튕기거나 나갔다면 아래의 링크를 통해 다시 접속해주세요.\n" \
                   "{0}".format(now_schedule_link)
@@ -93,7 +93,7 @@ while True:
             if hour in ok_hour and hour != 12 and minute == send_min:
                 cnt = False
                 kakaoSendText(room, message)
-                print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n<{message}>\n전송했습니다\n')
+                print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n====================\n{message}\n====================\n전송했습니다\n')
                 time.sleep(0.1)
             else:
                 if not cnt:
@@ -103,4 +103,7 @@ while True:
             print("전송 가능한 시간이 아닙니다. 프로그램을 종료합니다", end="")
             exit()
 
-    time.sleep(60)
+    if now_schedule == "종례" and not cnt:
+        exit()
+
+    time.sleep(30)
