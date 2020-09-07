@@ -71,11 +71,11 @@ while True:
     day, hour, minute, second = getTime("요일"), getTime("시"), getTime("분"), getTime("초")
     col = hour - 7 if hour < 13 else hour - 8 # 교시
     ok_day = ["Mon", "Tue", "Wed", "Thu", "Fri"]
-    start_hour = 9
+    start_hour = 8
     term_hour = 1
     end_hour = 14 if day == "Wed" else 15 # 수요일은 6교시까지, 다른 날은 7교시까지
     ok_hour = [i for i in range(start_hour, end_hour+1, term_hour)] # 1시간마다 전송
-    send_min = 55 if hour < 13 else 45 # 점심 전까지는 55분에, 이후에는 45분에 안내
+    send_min = 53 if hour < 13 else 43 # 점심 전까지는 55분에, 이후에는 45분에 안내
     now_schedule = getTodaySchedule(day, col-1)
     now_schedule_link = getTodayScheduleLink(now_schedule)
 
@@ -106,4 +106,4 @@ while True:
     if now_schedule == "종례" and not cnt:
         exit()
 
-    time.sleep(30)
+    time.sleep(60)
