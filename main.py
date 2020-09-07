@@ -76,7 +76,7 @@ while True:
 
     for room in kakaoRoomName:
         if (day in ok_day):
-            if (hour in ok_hour and minute == send_min):
+            if (hour in ok_hour and hour != 12 and minute == send_min):
                 cnt = 0
                 kakaoSendText(room, message)
                 time.sleep(0.5)
