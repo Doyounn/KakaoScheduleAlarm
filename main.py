@@ -85,7 +85,7 @@ while True:
                   "{0}".format(now_schedule_link)
     else:
         message = "📢 [Bot] 현재 시간 {0}시 {1}분을 지나가고 있습니다.\n" \
-                 "{2}교시는 {3}시간입니다. 아래의 링크를 통해 들어오세요.\n" \
+                 "{2}교시는 '{3}'시간입니다. 아래의 링크를 통해 들어오세요.\n" \
                  "{4}".format(hour, minute, col, now_schedule, now_schedule_link)
 
     for room in kakaoRoomName:
@@ -93,7 +93,9 @@ while True:
             if hour in ok_hour and hour != 12 and minute == send_min:
                 cnt = False
                 kakaoSendText(room, message)
-                print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n====================\n{message}\n====================\n전송했습니다\n')
+                print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n'
+                      f'==============================\n{message}\n==============================\n'
+                      f'전송했습니다\n')
                 time.sleep(0.1)
             else:
                 if not cnt:
