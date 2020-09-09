@@ -75,18 +75,18 @@ while True:
     term_hour = 1
     end_hour = 14 if day == "Wed" else 15 # 수요일은 6교시까지, 다른 날은 7교시까지
     ok_hour = [i for i in range(start_hour, end_hour+1, term_hour)] # 1시간마다 전송
-    send_min = 53 if hour < 13 else 43 # 점심 전까지는 55분에, 이후에는 45분에 안내
+    send_min = 52 if hour < 13 else 42 # 점심 전까지는 52분에, 이후에는 42분에 안내
     now_schedule = getTodaySchedule(day, col-1)
     now_schedule_link = getTodayScheduleLink(now_schedule)
 
-    if now_schedule == getTodayScheduleLink(getTodaySchedule(day, col-2)):
-        message = "📢 [Bot] 이번교시는 연강입니다.\n" \
-                  "혹시 튕기거나 나갔다면 아래의 링크를 통해 다시 접속해주세요.\n" \
-                  "{0}".format(now_schedule_link)
+    if now_schedule == getTodaySchedule(day, col-2):
+        message = f'📢 [Bot] 이번교시는 연강입니다.\n' \
+                  f'혹시 튕기거나 나갔다면 아래의 링크를 통해 다시 접속해주세요.\n' \
+                  f'{now_schedule_link}'
     else:
-        message = "📢 [Bot] 현재 시간 {0}시 {1}분을 지나가고 있습니다.\n" \
-                 "{2}교시는 '{3}'시간입니다. 아래의 링크를 통해 들어오세요.\n" \
-                 "{4}".format(hour, minute, col, now_schedule, now_schedule_link)
+        message = f'📢 [Bot] 현재 시간 {hour}시 {minute}분을 지나가고 있습니다.\n' \
+                  f'{col}교시는 "{now_schedule}" 시간입니다. 아래의 링크를 통해서 들어오세요.\n' \
+                  f'{now_schedule_link}'
 
     for room in kakaoRoomName:
         if day in ok_day:
@@ -94,13 +94,16 @@ while True:
                 cnt = False
                 kakaoSendText(room, message)
                 print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n'
-                      f'==============================\n{message}\n==============================\n'
+                      f'========================================\n{message}\n========================================\n'
                       f'전송했습니다\n')
-                time.sleep(0.1)
             else:
                 if not cnt:
-                    print(f'{send_min}분이 되면 전송합니다')
-                    cnt = True
+                    try:
+                        print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다\n')
+                        cnt = True
+                    except:
+                        print("오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다", end="")
+                        exit()
         else:
             print("전송 가능한 시간이 아닙니다. 프로그램을 종료합니다", end="")
             exit()
