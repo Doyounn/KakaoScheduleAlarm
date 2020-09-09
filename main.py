@@ -34,28 +34,29 @@ PostMessage = win32api.PostMessage
 SendMessage = win32gui.SendMessage
 FindWindow = win32gui.FindWindow
 
-def getTime(type):
+def getTime(inp):
     return {
         "요일": time.strftime("%a", time.localtime(time.time())),
         "시": int(time.strftime("%H", time.localtime(time.time()))),
         "분": int(time.strftime("%M", time.localtime(time.time()))),
         "초": int(time.strftime("%S", time.localtime(time.time())))
-    }.get(type, "DEFAULT")
+    }.get(inp, "DEFAULT")
 
-def getNumDay(day):
+def getNumDay(inp):
     return {
         "Mon": 0,
         "Tue": 1,
         "Wed": 2,
         "Thu": 3,
         "Fri": 4,
-    }.get(day, "DEFAULT")
+    }.get(inp, "DEFAULT")
 
-def getTodaySchedule(day, col):
+def getTodaySchedule(inp_day, inp_col):
     try:
-        return schedule[getNumDay(day)][col]
-    except:
-        print("오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다", end="")
+        return schedule[getNumDay(inp_day)][inp_col]
+    except IndexError:
+        print("👍 오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다 👍", end="")
+    finally:
         exit()
 
 def getTodayScheduleLink(subject):
@@ -75,8 +76,7 @@ while True:
     day, hour, minute, second = getTime("요일"), getTime("시"), getTime("분"), getTime("초")
     col = hour - 7 if hour < 13 else hour - 8 # 교시
     ok_day = ["Mon", "Tue", "Wed", "Thu", "Fri"]
-    start_hour = 8
-    term_hour = 1
+    start_hour, term_hour = 8, 1
     end_hour = 14 if day == "Wed" else 15 # 수요일은 6교시까지, 다른 날은 7교시까지
     ok_hour = [i if i < 12 else i+1 for i in range(start_hour, end_hour, term_hour)] # 1시간마다 전송 (12시 제외)
     send_min = 52 if hour < 13 else 42 # 점심 전까지는 52분에, 이후에는 42분에 안내
@@ -97,15 +97,14 @@ while True:
             if hour in ok_hour and minute == send_min:
                 cnt = False
                 kakaoSendText(room, message)
-                print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n'
-                      f'========================================\n{message}\n========================================\n'
-                      f'전송했습니다\n')
+                print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^85}\n전송했습니다".format(hour, minute, second, room, f'\n{message}\n'))
             else:
                 if not cnt:
-                    print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다\n')
+                    print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다')
                     cnt = True
+            print()
         else:
-            print("전송 가능한 시간이 아닙니다. 프로그램을 종료합니다", end="")
+            print("오늘은 주말입니다. 프로그램을 실행할 수 없습니다", end="")
             exit()
 
     if now_schedule == "종례" and not cnt:
