@@ -52,7 +52,11 @@ def getNumDay(day):
     }.get(day, "DEFAULT")
 
 def getTodaySchedule(day, col):
-    return schedule[getNumDay(day)][col]
+    try:
+        return schedule[getNumDay(day)][col]
+    except:
+        print("오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다", end="")
+        exit()
 
 def getTodayScheduleLink(subject):
     return schedule_link.get(subject)
@@ -74,7 +78,7 @@ while True:
     start_hour = 8
     term_hour = 1
     end_hour = 14 if day == "Wed" else 15 # 수요일은 6교시까지, 다른 날은 7교시까지
-    ok_hour = [i for i in range(start_hour, end_hour+1, term_hour)] # 1시간마다 전송
+    ok_hour = [i if i < 12 else i+1 for i in range(start_hour, end_hour, term_hour)] # 1시간마다 전송 (12시 제외)
     send_min = 52 if hour < 13 else 42 # 점심 전까지는 52분에, 이후에는 42분에 안내
     now_schedule = getTodaySchedule(day, col-1)
     now_schedule_link = getTodayScheduleLink(now_schedule)
@@ -85,12 +89,12 @@ while True:
                   f'{now_schedule_link}'
     else:
         message = f'📢 [Bot] 현재 시간 {hour}시 {minute}분을 지나가고 있습니다.\n' \
-                  f'{col}교시는 "{now_schedule}" 시간입니다. 아래의 링크를 통해서 들어오세요.\n' \
+                  f'{col}교시는 "{now_schedule}" 시간입니다.\n' \
                   f'{now_schedule_link}'
 
     for room in kakaoRoomName:
         if day in ok_day:
-            if hour in ok_hour and hour != 12 and minute == send_min:
+            if hour in ok_hour and minute == send_min:
                 cnt = False
                 kakaoSendText(room, message)
                 print(f'{hour}시 {minute}분 {second}초, "{room}"방에\n'
@@ -98,12 +102,8 @@ while True:
                       f'전송했습니다\n')
             else:
                 if not cnt:
-                    try:
-                        print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다\n')
-                        cnt = True
-                    except:
-                        print("오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다", end="")
-                        exit()
+                    print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다\n')
+                    cnt = True
         else:
             print("전송 가능한 시간이 아닙니다. 프로그램을 종료합니다", end="")
             exit()
