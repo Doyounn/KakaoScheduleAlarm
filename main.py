@@ -56,7 +56,6 @@ def getTodaySchedule(inp_day, inp_col):
         return schedule[getNumDay(inp_day)][inp_col]
     except IndexError:
         print("👍 오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다 👍", end="")
-    finally:
         exit()
 
 def getTodayScheduleLink(subject):
