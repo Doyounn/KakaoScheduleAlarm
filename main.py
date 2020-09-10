@@ -1,4 +1,4 @@
-import time, win32con, win32api, win32gui, ctypes
+import time, win32con, win32api, win32gui, ctypes, who_will_present_science as ps
 
 schedule = [
     ["자료구조B", "통합과학", "통합사회", "수학", "자료구조A", "체육", "국어"],
@@ -71,6 +71,24 @@ def SendReturn(hwnd):
     time.sleep(0.1)
     win32api.PostMessage(hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
 
+trees = [ps.result.get("Tree 1"), ps.result.get("Tree 2"), ps.result.get("Tree 3")]
+presenter = list()
+
+try:
+    for ori in ps.result.get("Origin"):
+        presenter.append(ps.getInfoByNum(ori).get("name"))
+
+    for tree in trees:
+        for branch in tree.items():
+            for leaf in branch[1]:
+                presenter.append(ps.getInfoByNum(leaf).get("name"))
+finally:
+    presenter = list(set(presenter))
+    result = ""
+
+    for pst in enumerate(presenter):
+        result += pst[1] if pst[0]+1 == len(presenter) else pst[1] + ", "
+
 while True:
     day, hour, minute, second = getTime("요일"), getTime("시"), getTime("분"), getTime("초")
     col = hour - 7 if hour < 13 else hour - 8 # 교시
@@ -81,6 +99,7 @@ while True:
     send_min = 52 if hour < 13 else 42 # 점심 전까지는 52분에, 이후에는 42분에 안내
     now_schedule = getTodaySchedule(day, col-1)
     now_schedule_link = getTodayScheduleLink(now_schedule)
+    sciencePresenterMessage = f"☆ [{result}]는 발표를 준비해주세요 ☆"
 
     if now_schedule == getTodaySchedule(day, col-2):
         message = f'📢 [Bot] 이번교시는 연강입니다.\n' \
@@ -96,12 +115,16 @@ while True:
             if hour in ok_hour and minute == send_min:
                 cnt = False
                 kakaoSendText(room, message)
-                print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^85}\n전송했습니다".format(hour, minute, second, room, f'\n{message}\n'))
+                print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^85}\n전송했습니다\n".format(hour, minute, second, room, f'\n{message}\n'))
+                kakaoSendText(room, sciencePresenterMessage)
+
+                if now_schedule == "통합과학":
+                    kakaoSendText(room, sciencePresenterMessage)
+                    print(f"+ 통합과학 발표 대상자도 전송했습니다({result})\n")
             else:
                 if not cnt:
                     print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다')
                     cnt = True
-            print()
         else:
             print("오늘은 주말입니다. 프로그램을 실행할 수 없습니다", end="")
             exit()
