@@ -114,7 +114,6 @@ while True:
                 cnt = False
                 kakaoSendText(room, message)
                 print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^85}\n전송했습니다\n".format(hour, minute, second, room, f'\n{message}\n'))
-                kakaoSendText(room, sciencePresenterMessage)
 
                 if now_schedule == "통합과학":
                     kakaoSendText(room, sciencePresenterMessage)
