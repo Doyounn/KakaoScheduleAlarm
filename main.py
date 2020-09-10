@@ -32,11 +32,6 @@ schedule_link = {
 kakaoRoomName = ["고1 쌤없 반톡", "1-5반 (선생님)"]
 cnt = False
 
-_user32 = ctypes.WinDLL("user32")
-PostMessage = win32api.PostMessage
-SendMessage = win32gui.SendMessage
-FindWindow = win32gui.FindWindow
-
 def getTime(inp):
     return {
         "요일": time.strftime("%a", time.localtime(time.time())),
