@@ -1,4 +1,4 @@
-import time, win32con, win32api, win32gui, ctypes, who_will_present_science as ps
+import time, win32con, win32api, win32gui, who_will_present_science as ps
 
 schedule = [
     ["자료구조B", "통합과학", "통합사회", "수학", "자료구조A", "체육", "국어", "종례"],
@@ -97,7 +97,7 @@ while True:
     send_min = 52 if hour < 13 else 42 # 점심 전까지는 52분에, 이후에는 42분에 안내
     now_schedule = getTodaySchedule(day, col-1)
     now_schedule_link = getTodayScheduleLink(now_schedule)
-    sciencePresenterMessage = f"☆ [{result}]는 발표를 준비해주세요 ☆"
+    sciencePresenterMessage = f"☆ 통합과학: [{result}]는 발표를 준비해주세요 ☆"
 
     if now_schedule == getTodaySchedule(day, col-2):
         message = f'📢 [Bot] 이번교시는 연강입니다.\n' \
