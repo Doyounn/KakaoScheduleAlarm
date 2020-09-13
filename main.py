@@ -108,6 +108,8 @@ while True:
 
         if now_schedule == "종례" and not trg:
             exit()
+            
+        time.sleep(60)
     else:
         print("오늘은 주말입니다. 프로그램을 실행할 수 없습니다", end="")
         exit()
