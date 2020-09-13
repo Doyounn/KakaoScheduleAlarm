@@ -52,7 +52,7 @@ def getNumDay(inp):
 def getTodaySchedule(inp_day, inp_col):
     try:
         return schedule[getNumDay(inp_day)][inp_col]
-    except IndexError:
+    except (IndexError, TypeError):
         print("👍 오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다 👍", end="")
         exit()
 
@@ -108,12 +108,12 @@ while True:
                   f'{col}교시는 "{now_schedule}" 시간입니다.\n' \
                   f'{now_schedule_link}'
 
-    for room in kakaoRoomName:
-        if day in ok_day:
+    if day in ok_day:
+        for room in kakaoRoomName:
             if hour in ok_hour and minute == send_min:
                 cnt = False
                 kakaoSendText(room, message)
-                print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^85}\n전송했습니다\n".format(hour, minute, second, room, f'\n{message}\n'))
+                print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^185}\n전송했습니다\n".format(hour, minute, second, room, f'\n{message}\n'))
 
                 if now_schedule == "통합과학":
                     kakaoSendText(room, sciencePresenterMessage)
@@ -122,9 +122,9 @@ while True:
                 if not cnt:
                     print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다')
                     cnt = True
-        else:
-            print("오늘은 주말입니다. 프로그램을 실행할 수 없습니다", end="")
-            exit()
+    else:
+        print("오늘은 주말입니다. 프로그램을 실행할 수 없습니다", end="")
+        exit()
 
     if now_schedule == "종례" and not cnt:
         exit()
