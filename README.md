@@ -18,5 +18,6 @@
     return ourClass[num-1]
 </code></pre>
 <br>
+
 # 참고
 보내고 싶은 채팅방을 미리 열어두셔야 합니다
