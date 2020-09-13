@@ -30,45 +30,29 @@ schedule_link = {
 
 # 채팅방 이름
 kakaoRoomName = ["고1 쌤없 반톡", "1-5반 (선생님)"]
-cnt = False
+trg = False
+dow = datetime.datetime.now().weekday()
 
-def getTime(inp):
-    return {
-        "요일": time.strftime("%a", time.localtime(time.time())),
-        "시": int(time.strftime("%H", time.localtime(time.time()))),
-        "분": int(time.strftime("%M", time.localtime(time.time()))),
-        "초": int(time.strftime("%S", time.localtime(time.time())))
-    }.get(inp, "DEFAULT")
-
-def getNumDay(inp):
-    return {
-        "Mon": 0,
-        "Tue": 1,
-        "Wed": 2,
-        "Thu": 3,
-        "Fri": 4,
-    }.get(inp, "DEFAULT")
-
-def getTodaySchedule(inp_day, inp_col):
+# 시간표 받아오기
+def getTodaySchedule(inp_period, type="default"):
     try:
-        return schedule[getNumDay(inp_day)][inp_col]
+        if type == "default":
+            return schedule[dow][inp_period]
+        elif type == "link":
+            return schedule_link.get(schedule[dow][inp_period])
     except (IndexError, TypeError):
         print("👍 오늘의 모든 교시를 마쳤습니다. 프로그램을 종료합니다 👍", end="")
         exit()
 
-def getTodayScheduleLink(subject):
-    return schedule_link.get(subject)
-
+# 카카오톡 제어
 def kakaoSendText(roomName, text):
     hwnd = win32gui.FindWindowEx(win32gui.FindWindow(None, roomName), None, "RichEdit50W", None)
     win32api.SendMessage(hwnd, win32con.WM_SETTEXT, 0, text)
-    SendReturn(hwnd)
-
-def SendReturn(hwnd):
     win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, win32con.VK_RETURN, 0)
     time.sleep(0.1)
     win32api.PostMessage(hwnd, win32con.WM_KEYUP, win32con.VK_RETURN, 0)
 
+# 과학 발표자
 trees = [ps.result.get("Tree 1"), ps.result.get("Tree 2"), ps.result.get("Tree 3")]
 presenter = list()
 
@@ -81,52 +65,49 @@ try:
             for leaf in branch[1]:
                 presenter.append(ps.getInfoByNum(leaf).get("name"))
 finally:
-    presenter = list(set(presenter))
     result = ""
-
-    for pst in enumerate(presenter):
-        result += pst[1] if pst[0]+1 == len(presenter) else pst[1] + ", "
-
+    for pst in enumerate(list(set(presenter))):
+        result += pst[1] if pst[0]+1 == len(list(set(presenter))) else pst[1] + ", "
+        
+# 작동
 while True:
-    day, hour, minute, second = getTime("요일"), getTime("시"), getTime("분"), getTime("초")
-    col = hour - 7 if hour < 13 else hour - 8 # 교시
-    ok_day = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+    now = datetime.datetime.now()
     start_hour, term_hour = 8, 1
-    end_hour = 14 if day == "Wed" else 15 # 수요일은 6교시까지, 다른 날은 7교시까지
-    ok_hour = [i if i < 12 else i+1 for i in range(start_hour, end_hour, term_hour)] # 1시간마다 전송 (12시 제외)
-    send_min = 52 if hour < 13 else 42 # 점심 전까지는 52분에, 이후에는 42분에 안내
-    now_schedule = getTodaySchedule(day, col-1)
-    now_schedule_link = getTodayScheduleLink(now_schedule)
-    sciencePresenterMessage = f"☆ 통합과학: [{result}]는 발표를 준비해주세요 ☆"
+    end_hour = 14 if dow == 2 else 15
+    ok_hour = [i if i < 12 else i+1 for i in range(start_hour, end_hour, term_hour)]
+    period = now.hour-7 if now.hour < 13 else now.hour-8
+    send_min = 51 if now.hour < 13 else 41
 
-    if now_schedule == getTodaySchedule(day, col-2):
-        message = f'📢 [Bot] 이번교시는 연강입니다.\n' \
-                  f'혹시 튕기거나 나갔다면 아래의 링크를 통해 다시 접속해주세요.\n' \
-                  f'{now_schedule_link}'
-    else:
-        message = f'📢 [Bot] 현재 시간 {hour}시 {minute}분을 지나가고 있습니다.\n' \
-                  f'{col}교시는 "{now_schedule}" 시간입니다.\n' \
-                  f'{now_schedule_link}'
+    if dow in range(0,5): # 월화수목금
+        now_schedule = getTodaySchedule(period-1)
+        now_schedule_link = getTodaySchedule(period-1, "link")
+        sciencePresenterMessage = f"☆ 통합과학: [{result}]는 발표를 준비해주세요 ☆"
 
-    if day in ok_day:
+        if now_schedule == getTodaySchedule(period-2):
+            message = f'📢 [Bot] 이번교시는 연강입니다.\n' \
+                      f'혹시 튕기거나 나갔다면 아래의 링크를 통해 다시 접속해주세요.\n' \
+                      f'{now_schedule_link}'
+        else:
+            message = f'📢 [Bot] 현재 시간 {now.hour}시 {now.minute}분을 지나가고 있습니다.\n' \
+                      f'{period}교시는 "{now_schedule}" 시간입니다.\n' \
+                      f'{now_schedule_link}'
+
         for room in kakaoRoomName:
-            if hour in ok_hour and minute == send_min:
-                cnt = False
+            if now.hour in ok_hour and now.minute == send_min:
+                trg = False
                 kakaoSendText(room, message)
-                print("{0}시 {1}분 {2}초, '{3}'방에\n{4:=^185}\n전송했습니다\n".format(hour, minute, second, room, f'\n{message}\n'))
+                print("{}시 {}분 {}초, '{}'방에\n{:=^185}\n전송했습니다\n".format(now.hour, now.minute, now.second, room, f'\n{message}\n'))
 
                 if now_schedule == "통합과학":
                     kakaoSendText(room, sciencePresenterMessage)
                     print(f"+ 통합과학 발표 대상자도 전송했습니다({result})\n")
             else:
-                if not cnt:
-                    print(f'{send_min}분이 되면 "{getTodaySchedule(day, col)}" 시간 공지를 전송합니다')
-                    cnt = True
+                if not trg:
+                    print(f'{send_min}분이 되면 "{getTodaySchedule(period)}" 시간 공지를 전송합니다')
+                    trg = True
+
+        if now_schedule == "종례" and not trg:
+            exit()
     else:
         print("오늘은 주말입니다. 프로그램을 실행할 수 없습니다", end="")
         exit()
-
-    if now_schedule == "종례" and not cnt:
-        exit()
-
-    time.sleep(60)
